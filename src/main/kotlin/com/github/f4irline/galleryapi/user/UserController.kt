@@ -5,7 +5,6 @@ import com.github.f4irline.galleryapi.response.Success
 import com.github.f4irline.galleryapi.security.AuthDetails
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -15,7 +14,7 @@ class UserController(private val repository: UserRepository) {
     fun register(@RequestBody authDetails: AuthDetails): ResponseEntity<*> {
         val user: User
         return if (authDetails.name.matches("^[a-zA-Z0-9]{3,}\$".toRegex())) {
-            user = User(authDetails.name, BCryptPasswordEncoder().encode(authDetails.password), true)
+            user = User(authDetails.name)
             repository.save(user)
             ResponseEntity(Success("Registered user successfully."), HttpStatus.OK)
         } else {
