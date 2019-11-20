@@ -16,7 +16,7 @@ class UserController(private val repository: UserRepository) {
         return if (authDetails.name.matches("^[a-zA-Z0-9]{3,}\$".toRegex())) {
             user = User(authDetails.name)
             repository.save(user)
-            ResponseEntity(Success("Registered user successfully."), HttpStatus.OK)
+            ResponseEntity(Success("Registered user successfully.", user.token), HttpStatus.OK)
         } else {
             ResponseEntity(Error("Error registering user."), HttpStatus.BAD_REQUEST)
         }
