@@ -2,6 +2,7 @@ package com.github.f4irline.galleryapi.image
 
 import com.github.f4irline.galleryapi.user.UserRepository
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -10,12 +11,15 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 import org.springframework.core.io.UrlResource
+import org.springframework.http.MediaType
+import org.springframework.util.StreamUtils
 import java.net.MalformedURLException
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder
 import org.springframework.web.util.UriComponents
+import java.io.File
 
 
 @RestController
@@ -26,11 +30,11 @@ class ImageController(
         private val path: Path
 ) {
     @GetMapping("/")
-    fun listFiles(): ResponseEntity<List<UriComponents>> {
+    fun listFiles(): ResponseEntity<List<ByteArray>> {
         val imageList = imageRepository.findAll()
                 .map { ClassPathResource(it.path) }
-                .map { MvcUriComponentsBuilder
-                        .fromMethodName(ImageController::class.java, "serveFile", it.filename.toString()).build() }
+                .map { UrlResource(this.path.resolve(it.filename).toUri()) }
+                .map { StreamUtils.copyToByteArray(it.inputStream) }
                 .toList()
 
         return ResponseEntity.ok().body(imageList)
