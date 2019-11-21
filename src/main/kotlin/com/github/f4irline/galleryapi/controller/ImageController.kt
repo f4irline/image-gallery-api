@@ -8,7 +8,6 @@ import com.github.f4irline.galleryapi.util.ImageUtil
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 import org.springframework.web.bind.annotation.PathVariable
@@ -47,7 +46,7 @@ class ImageController(
         val imageList: MutableSet<Image> = user.imageList
         imageList.add(Image(imagePath, properties.name, properties.description))
 
-        Files.copy(file.inputStream, path.resolve(imagePath))
+        imageUtil.compressAndSave(path.resolve(imagePath), file.inputStream)
 
         userRepository.save(user)
     }
