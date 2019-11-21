@@ -1,8 +1,10 @@
-package com.github.f4irline.galleryapi.user
+package com.github.f4irline.galleryapi.controller
 
 import com.github.f4irline.galleryapi.response.Error
 import com.github.f4irline.galleryapi.response.Success
 import com.github.f4irline.galleryapi.security.AuthDetails
+import com.github.f4irline.galleryapi.model.User
+import com.github.f4irline.galleryapi.repository.UserRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

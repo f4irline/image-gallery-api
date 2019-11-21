@@ -1,6 +1,6 @@
-package com.github.f4irline.galleryapi.user
+package com.github.f4irline.galleryapi.model
 
-import com.github.f4irline.galleryapi.image.Image
+import com.github.f4irline.galleryapi.model.Image
 import java.util.*
 import javax.persistence.*
 

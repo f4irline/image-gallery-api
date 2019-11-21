@@ -1,4 +1,4 @@
-package com.github.f4irline.galleryapi.image
+package com.github.f4irline.galleryapi.dto
 
 class ImageDTO (
         val name: String,

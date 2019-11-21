@@ -1,6 +1,9 @@
-package com.github.f4irline.galleryapi.image
+package com.github.f4irline.galleryapi.controller
 
-import com.github.f4irline.galleryapi.user.UserRepository
+import com.github.f4irline.galleryapi.model.Image
+import com.github.f4irline.galleryapi.dto.ImageDTO
+import com.github.f4irline.galleryapi.repository.ImageRepository
+import com.github.f4irline.galleryapi.repository.UserRepository
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
