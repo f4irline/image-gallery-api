@@ -13,11 +13,11 @@ import java.nio.file.Path
 class ImageUtil(
         private val path: Path
 ) {
-    fun mapImageToDTO(images: Iterable<Image>): List<ImageDTO> {
-        return images
-                .map { mapOf("resource" to ClassPathResource(it.path), "properties" to ImageDTO(it.name, it.description)) }
-                .map { mapOf("resource" to this.path.resolve((it["resource"] as ClassPathResource).filename ?: throw NoSuchFileException("No such file.")), "properties" to it["properties"])}
-                .map { mapOf("resource" to UrlResource((it["resource"] as Path).toUri()), "properties" to it["properties"]) }
-                .map { ImageDTO((it["properties"] as ImageDTO).name, (it["properties"] as ImageDTO).description, StreamUtils.copyToByteArray((it["resource"] as UrlResource).inputStream)) }
+    fun mapImageToDTO(image: Image): ImageDTO {
+        val resource = ClassPathResource(image.path).filename ?: throw NoSuchFileException("No such file.")
+        val fileName = this.path.resolve(resource)
+        val urlResource = UrlResource(fileName.toUri())
+        val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
+        return ImageDTO(image.name, image.description, imgBytes)
     }
 }

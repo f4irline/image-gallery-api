@@ -24,7 +24,8 @@ class ImageController(
 ) {
     @GetMapping("/")
     fun listFiles(): ResponseEntity<List<ImageDTO>> {
-        val imageList = imageUtil.mapImageToDTO(imageRepository.findAll())
+        val imageList = imageRepository.findAll()
+                .map { imageUtil.mapImageToDTO(it) }
         return ResponseEntity.ok().body(imageList)
     }
 
