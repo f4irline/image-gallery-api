@@ -24,12 +24,23 @@ class ImageController(
         private val path: Path
 ) {
     @GetMapping("/")
-    fun listFiles(): ResponseEntity<List<ByteArray>> {
+    fun listFiles(): ResponseEntity<List<ImageDTO>> {
+/*
+        val imageList = imageRepository.findAll()
+                .map { ImageDTO(it.name, it.description, StreamUtils.copyToByteArray(UrlResource(this.path.resolve(ClassPathResource(it.path).filename).toUri()).inputStream)) }
+                .toList()
+*/
+        val imageList = imageRepository.findAll()
+                .map { mapOf("resource" to ClassPathResource(it.path), "properties" to ImageDTO(it.name, it.description)) }
+                .map { mapOf("resource" to UrlResource(this.path.resolve((it["resource"] as ClassPathResource).filename).toUri()), "properties" to it["properties"]) }
+                .map { ImageDTO((it["properties"] as ImageDTO).name, (it["properties"] as ImageDTO).description, StreamUtils.copyToByteArray((it["resource"] as UrlResource).inputStream)) }
+/*
         val imageList = imageRepository.findAll()
                 .map { ClassPathResource(it.path) }
                 .map { UrlResource(this.path.resolve(it.filename).toUri()) }
-                .map { StreamUtils.copyToByteArray(it.inputStream) }
+                .map { ImageDTO("name", "Test", StreamUtils.copyToByteArray(it.inputStream)) }
                 .toList()
+*/
 
         return ResponseEntity.ok().body(imageList)
     }
