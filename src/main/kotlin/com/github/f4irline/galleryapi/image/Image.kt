@@ -7,5 +7,7 @@ import javax.persistence.Id
 @Entity
 class Image (
         var path: String,
+        var name: String,
+        var description: String,
         @Id @GeneratedValue var id: Long? = null
 )
