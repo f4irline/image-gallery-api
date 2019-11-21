@@ -1,4 +1,4 @@
-package com.github.f4irline.galleryapi.model
+package com.github.f4irline.galleryapi.entity
 
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue

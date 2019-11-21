@@ -1,23 +1,17 @@
 package com.github.f4irline.galleryapi.controller
 
-import com.github.f4irline.galleryapi.model.Image
+import com.github.f4irline.galleryapi.entity.Image
 import com.github.f4irline.galleryapi.dto.ImageDTO
 import com.github.f4irline.galleryapi.repository.ImageRepository
 import com.github.f4irline.galleryapi.repository.UserRepository
 import com.github.f4irline.galleryapi.util.ImageUtil
-import org.springframework.core.io.ClassPathResource
-import org.springframework.core.io.Resource
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
-import org.springframework.core.io.UrlResource
-import org.springframework.util.StreamUtils
-import java.net.MalformedURLException
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.GetMapping
 
 @RestController

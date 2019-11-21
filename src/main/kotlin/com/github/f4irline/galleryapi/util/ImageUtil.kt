@@ -2,7 +2,7 @@ package com.github.f4irline.galleryapi.util
 
 import com.github.f4irline.galleryapi.dto.ImageDTO
 import com.github.f4irline.galleryapi.exception.NoSuchFileException
-import com.github.f4irline.galleryapi.model.Image
+import com.github.f4irline.galleryapi.entity.Image
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Component
