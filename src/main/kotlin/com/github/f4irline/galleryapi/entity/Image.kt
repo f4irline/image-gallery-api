@@ -4,10 +4,11 @@ import javax.persistence.*
 
 @Entity
 class Image (
-        var path: String,
-        var name: String,
-        var description: String,
-        @ManyToOne(cascade = [CascadeType.ALL])
-        val user: User,
-        @Id @GeneratedValue var id: Long? = null
+        val path: String,
+        val name: String,
+        val description: String,
+        val author: String,
+        @OneToMany(cascade = [CascadeType.ALL])
+        val comments: MutableSet<Comment> = mutableSetOf(),
+        @Id @GeneratedValue val id: Long? = null
 )

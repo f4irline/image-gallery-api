@@ -32,7 +32,7 @@ class ImageUtil(
         val fileName = this.path.resolve(resource)
         val urlResource = UrlResource(fileName.toUri())
         val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
-        return ImageDTO(image.name, image.description, imgBytes)
+        return ImageDTO(image.name, image.description, image.author, image.comments, image.id, imgBytes)
     }
 
     fun compressAndSave(path: Path, input: InputStream) {

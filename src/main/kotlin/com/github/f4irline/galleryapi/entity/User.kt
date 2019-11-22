@@ -5,9 +5,9 @@ import javax.persistence.*
 
 @Entity
 class User (
-        var name: String,
+        val name: String,
         val token: UUID = UUID.randomUUID(),
         @OneToMany(cascade = [CascadeType.ALL])
         val imageList: MutableSet<Image> = mutableSetOf(),
-        @Id @GeneratedValue var id: Long? = null
+        @Id @GeneratedValue val id: Long? = null
 )

@@ -32,7 +32,7 @@ class ImageController(
     fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
         val user = userRepository.findByToken(token) ?: throw Exception()
 
-        val imageList = imageRepository.findByUser(user)
+        val imageList = imageRepository.findByAuthor(user.name)
                 .map { imageUtil.mapImageToDTO(it) }
 
         return ResponseEntity.ok().body(imageList)
@@ -49,12 +49,10 @@ class ImageController(
         }
         val uuid = UUID.randomUUID().toString()
         val imagePath = path.resolve("$uuid.jpg").toString()
-        println(file)
-
         val user = userRepository.findByToken(token) ?: throw Exception()
 
         val imageList: MutableSet<Image> = user.imageList
-        imageList.add(Image(imagePath, properties.name, properties.description, user))
+        imageList.add(Image(imagePath, properties.name, properties.description, user.name))
 
         imageUtil.compressAndSave(path.resolve(imagePath), file.inputStream)
 
