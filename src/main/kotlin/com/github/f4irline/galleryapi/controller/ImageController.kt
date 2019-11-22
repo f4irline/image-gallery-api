@@ -2,6 +2,7 @@ package com.github.f4irline.galleryapi.controller
 
 import com.github.f4irline.galleryapi.entity.Image
 import com.github.f4irline.galleryapi.dto.ImageDTO
+import com.github.f4irline.galleryapi.exception.NoSuchUserException
 import com.github.f4irline.galleryapi.repository.ImageRepository
 import com.github.f4irline.galleryapi.repository.UserRepository
 import com.github.f4irline.galleryapi.util.ImageUtil
@@ -30,7 +31,7 @@ class ImageController(
 
     @GetMapping("/user/{token}")
     fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
-        val user = userRepository.findByToken(token) ?: throw Exception()
+        val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
         val imageList = imageRepository.findByAuthor(user.name)
                 .map { imageUtil.mapImageToDTO(it) }
@@ -49,7 +50,7 @@ class ImageController(
         }
         val uuid = UUID.randomUUID().toString()
         val imagePath = path.resolve("$uuid.jpg").toString()
-        val user = userRepository.findByToken(token) ?: throw Exception()
+        val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
         val imageList: MutableSet<Image> = user.imageList
         imageList.add(Image(imagePath, properties.name, properties.description, user.name))

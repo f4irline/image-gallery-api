@@ -1,6 +1,8 @@
 package com.github.f4irline.galleryapi.controller
 
 import com.github.f4irline.galleryapi.entity.Comment
+import com.github.f4irline.galleryapi.exception.NoSuchImageException
+import com.github.f4irline.galleryapi.exception.NoSuchUserException
 import com.github.f4irline.galleryapi.repository.CommentRepository
 import com.github.f4irline.galleryapi.repository.ImageRepository
 import com.github.f4irline.galleryapi.repository.UserRepository
@@ -22,8 +24,8 @@ class CommentController(
             @PathVariable("imageId") imageId: Long,
             @PathVariable("userToken") userToken: UUID,
             @RequestBody comment: Comment) {
-        val image = imageRepository.findByIdOrNull(imageId) ?: throw Exception("No such image.")
-        val user = userRepository.findByToken(userToken) ?: throw Exception("No such user.")
+        val image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
+        val user = userRepository.findByToken(userToken) ?: throw NoSuchUserException("No such user.")
 
         comment.author = user.name
 
