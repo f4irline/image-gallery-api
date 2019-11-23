@@ -1,6 +1,7 @@
 package com.github.f4irline.galleryapi.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -15,5 +16,11 @@ class Image (
         val user: User,
         @OneToMany(cascade = [CascadeType.ALL], mappedBy = "image", orphanRemoval = true)
         val comments: MutableSet<Comment> = mutableSetOf(),
+        @ElementCollection
+        @JsonIgnore
+        val upVotedUsers: MutableSet<UUID> = mutableSetOf(),
+        @ElementCollection
+        @JsonIgnore
+        val downVotedUsers: MutableSet<UUID> = mutableSetOf(),
         @Id @GeneratedValue val imageId: Long? = null
 )

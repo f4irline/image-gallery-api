@@ -82,7 +82,27 @@ class ImageController(
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token."))
         } else {
             imageRepository.deleteById(imageId)
-            ResponseEntity.ok().body(Success("Deleted image successfullyy"))
+            ResponseEntity.ok().body(Success("Deleted image successfully"))
+        }
+    }
+
+    @PutMapping("/vote/{userToken}/{imageId}/{upVote}")
+    fun voteImage(
+            @PathVariable("userToken") userToken: UUID,
+            @PathVariable("imageId") imageId: Long,
+            @PathVariable("upVote") upVote: Boolean
+    ): ResponseEntity<*> {
+        val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
+        return if (upVote) {
+            image.downVotedUsers.remove(userToken)
+            image.upVotedUsers.add(userToken)
+            imageRepository.save(image)
+            ResponseEntity.ok().body(Success("Upvoted successfully."))
+        } else {
+            image.upVotedUsers.remove(userToken)
+            image.downVotedUsers.add(userToken)
+            imageRepository.save(image)
+            ResponseEntity.ok().body(Success("Downvoted successfully."))
         }
     }
 }

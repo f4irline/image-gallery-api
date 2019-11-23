@@ -37,7 +37,20 @@ class ImageUtil(
         val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
         val userCanDelete = token?.equals(image.user.token)
         val comments = image.comments.map { mapCommentToDTO(it, token) }
-        return ImageDTO(image.name, image.description, userCanDelete, image.author, comments, image.imageId, imgBytes)
+        val score = image.upVotedUsers.size - image.downVotedUsers.size
+        val userUpVoted = image.upVotedUsers.any { it == token }
+        val userDownVoted = image.downVotedUsers.any { it == token }
+        return ImageDTO(
+                image.name,
+                image.description,
+                userCanDelete, image.author,
+                comments,
+                score,
+                userUpVoted,
+                userDownVoted,
+                image.imageId,
+                imgBytes
+        )
     }
 
     fun mapCommentToDTO(comment: Comment, token: UUID?): CommentDTO {
