@@ -29,16 +29,24 @@ class ImageController(
     @GetMapping("/")
     fun listFiles(): ResponseEntity<List<ImageDTO>> {
         val imageList = imageRepository.findAll()
-                .map { imageUtil.mapImageToDTO(it) }
+                .map { imageUtil.mapImageToDTO(it, null) }
         return ResponseEntity.ok().body(imageList)
     }
+
+    @GetMapping("/{token}")
+    fun listFilesWithToken(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
+        val imageList = imageRepository.findAll()
+                .map { imageUtil.mapImageToDTO(it, token) }
+        return ResponseEntity.ok().body(imageList)
+    }
+
 
     @GetMapping("/user/{token}")
     fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
         val imageList = imageRepository.findByAuthor(user.name)
-                .map { imageUtil.mapImageToDTO(it) }
+                .map { imageUtil.mapImageToDTO(it, token) }
 
         return ResponseEntity.ok().body(imageList)
     }

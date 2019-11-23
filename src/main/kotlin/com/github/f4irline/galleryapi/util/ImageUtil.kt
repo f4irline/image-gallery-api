@@ -13,6 +13,7 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Path
+import java.util.*
 import javax.imageio.IIOImage
 import javax.imageio.ImageIO
 import javax.imageio.ImageWriteParam
@@ -27,12 +28,13 @@ class ImageUtil(
         const val COMPRESSION_RATIO = 0.05f
     }
 
-    fun mapImageToDTO(image: Image): ImageDTO {
+    fun mapImageToDTO(image: Image, token: UUID?): ImageDTO {
         val resource = ClassPathResource(image.path).filename ?: throw NoSuchFileException("No such file.")
         val fileName = this.path.resolve(resource)
         val urlResource = UrlResource(fileName.toUri())
         val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
-        return ImageDTO(image.name, image.description, image.author, image.comments, image.id, imgBytes)
+        val userCanDelete = token?.equals(image.user.token)
+        return ImageDTO(image.name, image.description, userCanDelete, image.author, image.comments, image.id, imgBytes)
     }
 
     fun compressAndSave(path: Path, input: InputStream) {
