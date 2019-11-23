@@ -1,6 +1,5 @@
 package com.github.f4irline.galleryapi.controller
 
-import com.github.f4irline.galleryapi.response.Error
 import com.github.f4irline.galleryapi.response.Success
 import com.github.f4irline.galleryapi.security.AuthDetails
 import com.github.f4irline.galleryapi.entity.User
@@ -18,9 +17,9 @@ class UserController(private val repository: UserRepository) {
         return if (authDetails.name.matches("^[a-zA-Z0-9]{3,}\$".toRegex())) {
             user = User(authDetails.name)
             repository.save(user)
-            ResponseEntity(Success("Registered user successfully.", user.token), HttpStatus.OK)
+            ResponseEntity.status(HttpStatus.OK).body(Success("Saved user successfully."))
         } else {
-            ResponseEntity(Error("Error registering user."), HttpStatus.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Success("Error registering user."))
         }
     }
 }

@@ -2,10 +2,14 @@ package com.github.f4irline.galleryapi.controller
 
 import com.github.f4irline.galleryapi.entity.Image
 import com.github.f4irline.galleryapi.dto.ImageDTO
+import com.github.f4irline.galleryapi.exception.NoSuchImageException
 import com.github.f4irline.galleryapi.exception.NoSuchUserException
 import com.github.f4irline.galleryapi.repository.ImageRepository
 import com.github.f4irline.galleryapi.repository.UserRepository
+import com.github.f4irline.galleryapi.response.Success
 import com.github.f4irline.galleryapi.util.ImageUtil
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -53,10 +57,24 @@ class ImageController(
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
         val imageList: MutableSet<Image> = user.imageList
-        imageList.add(Image(imagePath, properties.name, properties.description, user.name))
+        imageList.add(Image(imagePath, properties.name, properties.description, user.name, user))
 
         imageUtil.compressAndSave(path.resolve(imagePath), file.inputStream)
 
         userRepository.save(user)
+    }
+
+    @DeleteMapping("/{userToken}/{imageId}")
+    fun deleteImage(
+            @PathVariable("userToken") userToken: UUID,
+            @PathVariable("imageId") imageId: Long): ResponseEntity<*> {
+        val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
+
+        return if (image.user.token !== userToken) {
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token."))
+        } else {
+            imageRepository.deleteById(imageId)
+            ResponseEntity.ok().body(Success("Deleted image successfullyy"))
+        }
     }
 }
