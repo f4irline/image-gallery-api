@@ -13,13 +13,13 @@ import javax.servlet.ServletContextListener
 class GalleryApiApplication {
 	@Bean
 	fun path(): Path {
-		return Paths.get(System.getProperty("java.io.tmpdir"))
+		return Paths.get(System.getProperty("java.io.tmpdir")+"/image-gallery-api")
 	}
 
 	@Bean
 	fun servletListener(): ServletListenerRegistrationBean<ServletContextListener> {
 		val servletRegistrationBean: ServletListenerRegistrationBean<ServletContextListener> = ServletListenerRegistrationBean()
-		servletRegistrationBean.listener = CustomServletContextListener()
+		servletRegistrationBean.listener = CustomServletContextListener(path())
 		return servletRegistrationBean
 	}
 }
