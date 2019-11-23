@@ -36,7 +36,9 @@ class ImageUtil(
         val urlResource = UrlResource(fileName.toUri())
         val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
         val userCanDelete = token?.equals(image.user.token)
-        val comments = image.comments.map { mapCommentToDTO(it, token) }
+        val comments = image.comments
+                .map { mapCommentToDTO(it, token) }
+                .sortedByDescending { it.id }
         val score = image.upVotedUsers.size - image.downVotedUsers.size
         val userUpVoted = image.upVotedUsers.any { it == token }
         val userDownVoted = image.downVotedUsers.any { it == token }

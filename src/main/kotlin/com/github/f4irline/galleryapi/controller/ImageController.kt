@@ -28,14 +28,14 @@ class ImageController(
 ) {
     @GetMapping("/")
     fun listFiles(): ResponseEntity<List<ImageDTO>> {
-        val imageList = imageRepository.findAll()
+        val imageList = imageRepository.findAllByOrderByImageIdDesc()
                 .map { imageUtil.mapImageToDTO(it, null) }
         return ResponseEntity.ok().body(imageList)
     }
 
     @GetMapping("/{token}")
     fun listFilesWithToken(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
-        val imageList = imageRepository.findAll()
+        val imageList = imageRepository.findAllByOrderByImageIdDesc()
                 .map { imageUtil.mapImageToDTO(it, token) }
         return ResponseEntity.ok().body(imageList)
     }
@@ -45,7 +45,7 @@ class ImageController(
     fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
-        val imageList = imageRepository.findByAuthor(user.name)
+        val imageList = imageRepository.findByUserOrderByImageIdDesc(user)
                 .map { imageUtil.mapImageToDTO(it, token) }
 
         return ResponseEntity.ok().body(imageList)

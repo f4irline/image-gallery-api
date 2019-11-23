@@ -15,7 +15,7 @@ class Image (
         @JoinColumn(name = "user_id")
         val user: User,
         @OneToMany(cascade = [CascadeType.ALL], mappedBy = "image", orphanRemoval = true)
-        val comments: MutableSet<Comment> = mutableSetOf(),
+        val comments: MutableList<Comment> = mutableListOf(),
         @ElementCollection
         @JsonIgnore
         val upVotedUsers: MutableSet<UUID> = mutableSetOf(),
