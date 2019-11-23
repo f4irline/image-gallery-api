@@ -78,7 +78,7 @@ class ImageController(
             @PathVariable("imageId") imageId: Long): ResponseEntity<*> {
         val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
 
-        return if (image.user.token !== userToken) {
+        return if (image.user.token != userToken) {
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token."))
         } else {
             imageRepository.deleteById(imageId)

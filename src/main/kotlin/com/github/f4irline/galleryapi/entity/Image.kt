@@ -11,8 +11,9 @@ class Image (
         val author: String,
         @JsonIgnore
         @ManyToOne
+        @JoinColumn(name = "user_id")
         val user: User,
-        @OneToMany(cascade = [CascadeType.ALL])
+        @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
         val comments: MutableSet<Comment> = mutableSetOf(),
-        @Id @GeneratedValue val id: Long? = null
+        @Id @GeneratedValue val imageId: Long? = null
 )

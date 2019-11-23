@@ -34,7 +34,7 @@ class ImageUtil(
         val urlResource = UrlResource(fileName.toUri())
         val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
         val userCanDelete = token?.equals(image.user.token)
-        return ImageDTO(image.name, image.description, userCanDelete, image.author, image.comments, image.id, imgBytes)
+        return ImageDTO(image.name, image.description, userCanDelete, image.author, image.comments, image.imageId, imgBytes)
     }
 
     fun compressAndSave(path: Path, input: InputStream) {

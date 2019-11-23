@@ -9,6 +9,7 @@ class Comment (
         var author: String,
         @JsonIgnore
         @ManyToOne
+        @JoinColumn(name = "user_id")
         var user: User,
-        @Id @GeneratedValue val id: Long? = null
+        @Id @GeneratedValue val commentId: Long? = null
 )
