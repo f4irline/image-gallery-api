@@ -47,7 +47,7 @@ class CommentController(
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token."))
         } else {
             commentRepository.deleteById(commentId)
-            ResponseEntity.ok().body(Success("Deleted image successfullyy"))
+            ResponseEntity.ok().body(Success("Deleted comment successfully."))
         }
     }
 }

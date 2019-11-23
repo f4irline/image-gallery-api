@@ -7,7 +7,7 @@ class ImageDTO (
         val description: String,
         val userCanDelete: Boolean?,
         val author: String?,
-        val comments: MutableSet<Comment>? = mutableSetOf(),
+        val comments: List<CommentDTO>? = listOf(),
         val id: Long?,
         val file: ByteArray? = null
 )

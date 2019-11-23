@@ -1,6 +1,8 @@
 package com.github.f4irline.galleryapi.util
 
+import com.github.f4irline.galleryapi.dto.CommentDTO
 import com.github.f4irline.galleryapi.dto.ImageDTO
+import com.github.f4irline.galleryapi.entity.Comment
 import com.github.f4irline.galleryapi.exception.NoSuchFileException
 import com.github.f4irline.galleryapi.entity.Image
 import org.springframework.core.io.ClassPathResource
@@ -34,7 +36,13 @@ class ImageUtil(
         val urlResource = UrlResource(fileName.toUri())
         val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
         val userCanDelete = token?.equals(image.user.token)
-        return ImageDTO(image.name, image.description, userCanDelete, image.author, image.comments, image.imageId, imgBytes)
+        val comments = image.comments.map { mapCommentToDTO(it, token) }
+        return ImageDTO(image.name, image.description, userCanDelete, image.author, comments, image.imageId, imgBytes)
+    }
+
+    fun mapCommentToDTO(comment: Comment, token: UUID?): CommentDTO {
+        val userCanDelete = token?.equals(comment.user.token)
+        return CommentDTO(comment.author, comment.comment, userCanDelete)
     }
 
     fun compressAndSave(path: Path, input: InputStream) {
