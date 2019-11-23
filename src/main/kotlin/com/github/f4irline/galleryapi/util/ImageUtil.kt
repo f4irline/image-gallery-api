@@ -42,7 +42,7 @@ class ImageUtil(
 
     fun mapCommentToDTO(comment: Comment, token: UUID?): CommentDTO {
         val userCanDelete = token?.equals(comment.user.token)
-        return CommentDTO(comment.author, comment.comment, userCanDelete)
+        return CommentDTO(comment.author, comment.comment, comment.commentId, userCanDelete)
     }
 
     fun compressAndSave(path: Path, input: InputStream) {

@@ -11,5 +11,9 @@ class Comment (
         @ManyToOne
         @JoinColumn(name = "user_id")
         var user: User,
+        @JsonIgnore
+        @ManyToOne
+        @JoinColumn(name = "image_id")
+        var image: Image,
         @Id @GeneratedValue val commentId: Long? = null
 )

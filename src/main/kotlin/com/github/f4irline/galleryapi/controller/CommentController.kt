@@ -32,18 +32,19 @@ class CommentController(
 
         comment.author = user.name
         comment.user = user
+        comment.image = image
 
         image.comments.add(comment)
         commentRepository.save(comment)
     }
 
-    @GetMapping("/{userToken}/{commentId}")
+    @DeleteMapping("/{userToken}/{commentId}")
     fun deleteComment(
             @PathVariable("userToken") userToken: UUID, @PathVariable("commentId") commentId: Long
     ): ResponseEntity<*> {
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw NoSuchCommentException("No such comment.")
 
-        return if (comment.user.token !== userToken) {
+        return if (comment.user.token != userToken) {
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token."))
         } else {
             commentRepository.deleteById(commentId)

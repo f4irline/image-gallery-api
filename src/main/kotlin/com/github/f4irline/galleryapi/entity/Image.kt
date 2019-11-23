@@ -13,7 +13,7 @@ class Image (
         @ManyToOne
         @JoinColumn(name = "user_id")
         val user: User,
-        @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+        @OneToMany(cascade = [CascadeType.ALL], mappedBy = "image", orphanRemoval = true)
         val comments: MutableSet<Comment> = mutableSetOf(),
         @Id @GeneratedValue val imageId: Long? = null
 )
