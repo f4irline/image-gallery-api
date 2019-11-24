@@ -13,6 +13,5 @@ class CustomServletContextListener(private val path: Path) : ServletContextListe
         if (!directory.exists()) {
             directory.mkdir()
         }
-        println("Callback triggered - ContextInitialized")
     }
 }

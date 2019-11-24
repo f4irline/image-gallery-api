@@ -4,11 +4,13 @@ import com.github.f4irline.galleryapi.service.CustomServletContextListener
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean
+import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import java.nio.file.Path
 import java.nio.file.Paths
 import javax.servlet.ServletContextListener
 
+@EnableCaching
 @SpringBootApplication
 class GalleryApiApplication {
 	@Bean
