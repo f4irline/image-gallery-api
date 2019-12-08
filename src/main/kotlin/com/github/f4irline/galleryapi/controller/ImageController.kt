@@ -17,6 +17,8 @@ import java.nio.file.Path
 import java.util.*
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.GetMapping
+import java.awt.image.BufferedImage
+import javax.imageio.ImageIO
 
 @RestController
 @RequestMapping("/api/image")
@@ -64,10 +66,12 @@ class ImageController(
         val imagePath = path.resolve("$uuid.jpg").toString()
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
-        val imageList: MutableSet<Image> = user.imageList
-        imageList.add(Image(imagePath, properties.name, properties.description, user.name, user))
+        val image: BufferedImage = ImageIO.read(file.inputStream)
 
-        imageUtil.compressAndSave(path.resolve(imagePath), file.inputStream)
+        val imageList: MutableSet<Image> = user.imageList
+        imageList.add(Image(imagePath, properties.name, properties.description, user.name, image.width, image.height, user))
+
+        imageUtil.compressAndSave(path.resolve(imagePath), image)
 
         userRepository.save(user)
     }

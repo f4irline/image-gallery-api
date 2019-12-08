@@ -10,6 +10,8 @@ class Image (
         val name: String,
         val description: String,
         val author: String,
+        val width: Int,
+        val height: Int,
         @JsonIgnore
         @ManyToOne
         @JoinColumn(name = "user_id")

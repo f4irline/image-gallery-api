@@ -51,7 +51,9 @@ class ImageUtil(
                 userUpVoted,
                 userDownVoted,
                 image.imageId,
-                imgBytes
+                imgBytes,
+                image.width,
+                image.height
         )
     }
 
@@ -60,9 +62,7 @@ class ImageUtil(
         return CommentDTO(comment.author, comment.comment, comment.commentId, userCanDelete)
     }
 
-    fun compressAndSave(path: Path, input: InputStream) {
-        val image: BufferedImage = ImageIO.read(input)
-
+    fun compressAndSave(path: Path, image: BufferedImage) {
         val output = File(path.toUri())
         val out: OutputStream = FileOutputStream(output)
 

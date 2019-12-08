@@ -10,5 +10,7 @@ class ImageDTO (
         val userUpVoted: Boolean?,
         val userDownVoted: Boolean?,
         val id: Long?,
-        val file: ByteArray? = null
+        val file: ByteArray? = null,
+        val height: Int,
+        val width: Int
 )
