@@ -57,12 +57,10 @@ class ImageController(
     @Throws
     fun uploadImage(
             @RequestPart("file") file: MultipartFile?,
-            @RequestPart("properties") properties: String?,
+            @RequestPart("name") name: String,
+            @RequestPart("description") description: String,
             @PathVariable("token") token: UUID) {
-        println(file)
-        println(properties)
         if (file == null) { return }
-        if (properties == null) { return }
         val uuid = UUID.randomUUID().toString()
         val imagePath = path.resolve("$uuid.jpg").toString()
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
@@ -70,9 +68,7 @@ class ImageController(
         val image: BufferedImage = ImageIO.read(file.inputStream)
 
         val imageList: MutableSet<Image> = user.imageList
-/*
-        imageList.add(Image(imagePath, properties.name, properties.description, user.name, image.width, image.height, user))
-*/
+        imageList.add(Image(imagePath, name, description, user.name, image.width, image.height, user))
 
         imageUtil.compressAndSave(path.resolve(imagePath), image)
 
