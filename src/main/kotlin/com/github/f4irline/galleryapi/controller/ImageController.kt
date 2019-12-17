@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.GetMapping
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
+import java.io.File
 import javax.imageio.ImageIO
 
 @RestController
@@ -57,7 +58,7 @@ class ImageController(
     @PostMapping("/{token}")
     @Throws
     fun uploadImage(
-            @RequestPart("file") file: MultipartFile?,
+            @RequestPart("file") file: File?,
             @RequestPart("name") name: String,
             @RequestPart("description") description: String,
             @PathVariable("token") token: UUID) {
@@ -67,7 +68,7 @@ class ImageController(
         val imagePath = path.resolve("$uuid.jpg").toString()
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
-        val image: BufferedImage = ImageIO.read(file.inputStream)
+        val image: BufferedImage = ImageIO.read(file.inputStream())
 
         val imageList: MutableSet<Image> = user.imageList
         imageList.add(Image(imagePath, name, description, user.name, image.width, image.height, user))
