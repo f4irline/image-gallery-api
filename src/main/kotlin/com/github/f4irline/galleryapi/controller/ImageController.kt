@@ -60,6 +60,7 @@ class ImageController(
             @RequestPart("name") name: String,
             @RequestPart("description") description: String,
             @PathVariable("token") token: UUID) {
+        println(file)
         if (file == null) { return }
         val uuid = UUID.randomUUID().toString()
         val imagePath = path.resolve("$uuid.jpg").toString()
