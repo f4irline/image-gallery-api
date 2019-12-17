@@ -57,11 +57,12 @@ class ImageController(
     @Throws
     fun uploadImage(
             @RequestPart("file") file: MultipartFile?,
-            @RequestPart("properties") properties: ImageDTO,
+            @RequestPart("properties") properties: ImageDTO?,
             @PathVariable("token") token: UUID) {
-        if (file == null) {
-            return
-        }
+        println(file)
+        println(properties)
+        if (file == null) { return }
+        if (properties == null) { return }
         val uuid = UUID.randomUUID().toString()
         val imagePath = path.resolve("$uuid.jpg").toString()
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
