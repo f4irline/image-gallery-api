@@ -58,7 +58,7 @@ class ImageController(
     @PostMapping("/{token}")
     @Throws
     fun uploadImage(
-            @RequestPart("file") file: File?,
+            @RequestPart("file") file: MultipartFile?,
             @RequestPart("name") name: String,
             @RequestPart("description") description: String,
             @PathVariable("token") token: UUID) {
@@ -68,7 +68,7 @@ class ImageController(
         val imagePath = path.resolve("$uuid.jpg").toString()
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
-        val image: BufferedImage = ImageIO.read(file.inputStream())
+        val image: BufferedImage = ImageIO.read(file.inputStream)
 
         val imageList: MutableSet<Image> = user.imageList
         imageList.add(Image(imagePath, name, description, user.name, image.width, image.height, user))
