@@ -66,7 +66,7 @@ class ImageController(
         val imagePath = path.resolve("$uuid.jpg").toString()
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
-        val fileBytes: ByteArray = file.toByteArray()
+        val fileBytes: ByteArray = Base64.getDecoder().decode(file)
         val image: BufferedImage = ImageIO.read(fileBytes.inputStream())
 
         val imageList: MutableSet<Image> = user.imageList
