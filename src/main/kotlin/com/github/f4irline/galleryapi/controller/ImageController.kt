@@ -57,7 +57,7 @@ class ImageController(
     @Throws
     fun uploadImage(
             @RequestPart("file") file: MultipartFile?,
-            @RequestPart("properties") properties: ImageDTO?,
+            @RequestPart("properties") properties: String?,
             @PathVariable("token") token: UUID) {
         println(file)
         println(properties)
@@ -70,7 +70,9 @@ class ImageController(
         val image: BufferedImage = ImageIO.read(file.inputStream)
 
         val imageList: MutableSet<Image> = user.imageList
+/*
         imageList.add(Image(imagePath, properties.name, properties.description, user.name, image.width, image.height, user))
+*/
 
         imageUtil.compressAndSave(path.resolve(imagePath), image)
 
