@@ -1,5 +1,6 @@
 package com.github.f4irline.galleryapi.controller
 
+import com.github.f4irline.galleryapi.dto.CommentDTO
 import com.github.f4irline.galleryapi.entity.Comment
 import com.github.f4irline.galleryapi.exception.NoSuchCommentException
 import com.github.f4irline.galleryapi.exception.NoSuchImageException
@@ -26,7 +27,7 @@ class CommentController(
     fun addComment(
             @PathVariable("imageId") imageId: Long,
             @PathVariable("userToken") userToken: UUID,
-            @RequestBody comment: Comment): ResponseEntity<Comment> {
+            @RequestBody comment: Comment): ResponseEntity<CommentDTO> {
         val image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
         val user = userRepository.findByToken(userToken) ?: throw NoSuchUserException("No such user.")
 
@@ -35,9 +36,9 @@ class CommentController(
         comment.image = image
 
         image.comments.add(comment)
-        commentRepository.save(comment)
+        val newComment = commentRepository.save(comment)
 
-        return ResponseEntity.ok().body(comment)
+        return ResponseEntity.ok().body(CommentDTO(newComment.author, newComment.comment, newComment.commentId, true))
     }
 
     @DeleteMapping("/{userToken}/{commentId}")
