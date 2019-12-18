@@ -26,7 +26,7 @@ class CommentController(
     fun addComment(
             @PathVariable("imageId") imageId: Long,
             @PathVariable("userToken") userToken: UUID,
-            @RequestBody comment: Comment) {
+            @RequestBody comment: Comment): ResponseEntity<Comment> {
         val image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
         val user = userRepository.findByToken(userToken) ?: throw NoSuchUserException("No such user.")
 
@@ -36,6 +36,8 @@ class CommentController(
 
         image.comments.add(comment)
         commentRepository.save(comment)
+
+        return ResponseEntity.ok().body(comment)
     }
 
     @DeleteMapping("/{userToken}/{commentId}")
