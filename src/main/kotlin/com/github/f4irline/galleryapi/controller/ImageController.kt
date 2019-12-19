@@ -44,6 +44,21 @@ class ImageController(
         return ResponseEntity.ok().body(imageList)
     }
 
+    @GetMapping("/single/{id}")
+    fun getSingleImage(@PathVariable("id") id: Long): ResponseEntity<ImageDTO> {
+        val image = imageRepository.findByIdOrNull(id) ?: throw NoSuchImageException("No such image.")
+        val imageDTO = imageUtil.mapImageToDTO(image, null)
+
+        return ResponseEntity.ok().body(imageDTO)
+    }
+
+    @GetMapping("/single/{token}/{id}")
+    fun getSingleImageWithToken(@PathVariable("token") token: UUID, @PathVariable("id") id: Long): ResponseEntity<ImageDTO> {
+        val image = imageRepository.findByIdOrNull(id) ?: throw NoSuchImageException("No such image.")
+        val imageDTO = imageUtil.mapImageToDTO(image, token)
+
+        return ResponseEntity.ok().body(imageDTO)
+    }
 
     @GetMapping("/user/{token}")
     fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
