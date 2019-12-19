@@ -112,20 +112,22 @@ class ImageController(
             @PathVariable("userToken") userToken: UUID,
             @PathVariable("imageId") imageId: Long,
             @PathVariable("upVote") upVote: Boolean
-    ): ResponseEntity<Image> {
+    ): ResponseEntity<ImageDTO> {
         val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
         return when {
             upVote -> {
                 image.downVotedUsers.remove(userToken)
                 image.upVotedUsers.add(userToken)
                 imageRepository.save(image)
-                ResponseEntity.ok().body(image)
+                val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+                ResponseEntity.ok().body(imageDTO)
             }
             else -> {
                 image.upVotedUsers.remove(userToken)
                 image.downVotedUsers.add(userToken)
                 imageRepository.save(image)
-                ResponseEntity.ok().body(image)
+                val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+                ResponseEntity.ok().body(imageDTO)
             }
         }
     }
@@ -134,11 +136,12 @@ class ImageController(
     fun resetVote(
             @PathVariable("userToken") userToken: UUID,
             @PathVariable("imageId") imageId: Long
-    ): ResponseEntity<Image> {
+    ): ResponseEntity<ImageDTO> {
         val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
         image.upVotedUsers.remove(userToken)
         image.downVotedUsers.remove(userToken)
         imageRepository.save(image)
-        return ResponseEntity.ok().body(image)
+        val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+        return ResponseEntity.ok().body(imageDTO)
     }
 }
