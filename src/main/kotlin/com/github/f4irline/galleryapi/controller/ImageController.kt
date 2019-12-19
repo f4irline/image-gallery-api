@@ -114,16 +114,31 @@ class ImageController(
             @PathVariable("upVote") upVote: Boolean
     ): ResponseEntity<*> {
         val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
-        return if (upVote) {
-            image.downVotedUsers.remove(userToken)
-            image.upVotedUsers.add(userToken)
-            imageRepository.save(image)
-            ResponseEntity.ok().body(Success("Upvoted successfully."))
-        } else {
-            image.upVotedUsers.remove(userToken)
-            image.downVotedUsers.add(userToken)
-            imageRepository.save(image)
-            ResponseEntity.ok().body(Success("Downvoted successfully."))
+        return when {
+            upVote -> {
+                image.downVotedUsers.remove(userToken)
+                image.upVotedUsers.add(userToken)
+                imageRepository.save(image)
+                ResponseEntity.ok().body(Success("Upvoted successfully."))
+            }
+            else -> {
+                image.upVotedUsers.remove(userToken)
+                image.downVotedUsers.add(userToken)
+                imageRepository.save(image)
+                ResponseEntity.ok().body(Success("Downvoted successfully."))
+            }
         }
+    }
+
+    @PutMapping("/vote/{userToken}/{imageId}/reset")
+    fun resetVote(
+            @PathVariable("userToken") userToken: UUID,
+            @PathVariable("imageId") imageId: Long
+    ): ResponseEntity<*> {
+        val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
+        image.upVotedUsers.remove(userToken)
+        image.downVotedUsers.remove(userToken)
+        imageRepository.save(image)
+        return ResponseEntity.ok().body(Success("Reseted vote successfully"))
     }
 }
