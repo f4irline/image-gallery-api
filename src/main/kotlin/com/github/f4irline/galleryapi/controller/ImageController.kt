@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.FileNotFoundException
 import javax.imageio.ImageIO
 
 @RestController
@@ -76,8 +77,8 @@ class ImageController(
             @RequestPart("file") file: MultipartFile?,
             @RequestPart("name") name: String,
             @RequestPart("description") description: String,
-            @PathVariable("token") token: UUID) {
-        if (file == null) { return }
+            @PathVariable("token") token: UUID): ResponseEntity<ImageDTO> {
+        if (file == null) { throw FileNotFoundException() }
         val uuid = UUID.randomUUID().toString()
         val imagePath = path.resolve("$uuid.jpg").toString()
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
@@ -85,11 +86,15 @@ class ImageController(
         val image: BufferedImage = ImageIO.read(file.inputStream)
 
         val imageList: MutableSet<Image> = user.imageList
-        imageList.add(Image(imagePath, name, description, user.name, image.width, image.height, user))
+        val newImage = Image(imagePath, name, description, user.name, image.width, image.height, user)
+        imageList.add(newImage)
 
         imageUtil.compressAndSave(path.resolve(imagePath), image)
-
         userRepository.save(user)
+
+        val imageDTO: ImageDTO = imageUtil.mapImageToDTO(newImage, token)
+
+        return ResponseEntity.ok().body(imageDTO)
     }
 
     @DeleteMapping("/{userToken}/{imageId}")
