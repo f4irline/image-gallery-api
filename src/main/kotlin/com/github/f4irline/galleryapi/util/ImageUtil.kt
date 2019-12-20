@@ -27,7 +27,7 @@ class ImageUtil(
         private val path: Path
 ) {
     companion object {
-        const val COMPRESSION_RATIO = 0.05f
+        const val COMPRESSION_RATIO = 0.02f
     }
 
     fun mapImageToDTO(image: Image, token: UUID?): ImageDTO {

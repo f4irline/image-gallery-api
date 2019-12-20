@@ -90,9 +90,10 @@ class ImageController(
         imageList.add(newImage)
 
         imageUtil.compressAndSave(path.resolve(imagePath), image)
-        userRepository.save(user)
+        val newUser = userRepository.save(user)
 
-        val imageDTO: ImageDTO = imageUtil.mapImageToDTO(newImage, token)
+        val newUserImage = newUser.imageList.find { it.path == imagePath } ?: throw NoSuchImageException("Error saving image")
+        val imageDTO: ImageDTO = imageUtil.mapImageToDTO(newUserImage, token)
 
         return ResponseEntity.ok().body(imageDTO)
     }
