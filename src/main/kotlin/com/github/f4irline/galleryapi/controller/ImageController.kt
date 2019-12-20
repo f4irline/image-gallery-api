@@ -77,7 +77,7 @@ class ImageController(
             @RequestPart("file") file: MultipartFile?,
             @RequestPart("name") name: String,
             @RequestPart("description") description: String,
-            @PathVariable("token") token: UUID): ResponseEntity<ImageDTO> {
+            @PathVariable("token") token: UUID): ResponseEntity<*> {
         if (file == null) { throw FileNotFoundException() }
         val uuid = UUID.randomUUID().toString()
         val imagePath = path.resolve("$uuid.jpg").toString()
@@ -90,12 +90,9 @@ class ImageController(
         imageList.add(newImage)
 
         imageUtil.compressAndSave(path.resolve(imagePath), image)
-        val newUser = userRepository.save(user)
+        userRepository.save(user)
 
-        val newUserImage = newUser.imageList.find { it.path == imagePath } ?: throw NoSuchImageException("Error saving image")
-        val imageDTO: ImageDTO = imageUtil.mapImageToDTO(newUserImage, token)
-
-        return ResponseEntity.ok().body(imageDTO)
+        return ResponseEntity.ok().body(Success("Uploaded image successfully"))
     }
 
     @DeleteMapping("/{userToken}/{imageId}")
