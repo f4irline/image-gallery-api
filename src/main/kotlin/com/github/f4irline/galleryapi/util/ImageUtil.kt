@@ -5,6 +5,7 @@ import com.github.f4irline.galleryapi.dto.ImageDTO
 import com.github.f4irline.galleryapi.entity.Comment
 import com.github.f4irline.galleryapi.exception.NoSuchFileException
 import com.github.f4irline.galleryapi.entity.Image
+import com.github.f4irline.galleryapi.repository.ImageRepository
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Component
@@ -24,14 +25,22 @@ import javax.imageio.stream.ImageOutputStream
 
 @Component
 class ImageUtil(
-        private val path: Path
+        private val path: Path,
+        private val imageRepository: ImageRepository
 ) {
     companion object {
-        const val COMPRESSION_RATIO = 0.02f
+        const val COMPRESSION_RATIO = 0.8f
     }
 
+    @Throws(NoSuchFileException::class)
     fun mapImageToDTO(image: Image, token: UUID?): ImageDTO {
-        val resource = ClassPathResource(image.path).filename ?: throw NoSuchFileException("No such file.")
+        val resource = ClassPathResource(image.path).filename
+
+        if (resource == null) {
+            image.imageId?.let { imageRepository.deleteById(it) }
+            throw NoSuchFileException("No such file.")
+        }
+
         val fileName = this.path.resolve(resource)
         val urlResource = UrlResource(fileName.toUri())
         val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
