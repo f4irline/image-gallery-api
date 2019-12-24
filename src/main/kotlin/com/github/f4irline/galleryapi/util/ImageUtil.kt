@@ -43,6 +43,12 @@ class ImageUtil(
 
         val fileName = this.path.resolve(resource)
         val urlResource = UrlResource(fileName.toUri())
+
+        if (!urlResource.isFile) {
+            image.imageId?.let { imageRepository.deleteById(it) }
+            throw NoSuchFileException("No such file.")
+        }
+
         val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
         val userCanDelete = token?.equals(image.user.token)
         val comments = image.comments
