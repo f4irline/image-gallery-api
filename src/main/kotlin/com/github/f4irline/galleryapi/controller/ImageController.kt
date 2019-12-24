@@ -32,14 +32,14 @@ class ImageController(
         private val imageUtil: ImageUtil
 ) {
     @GetMapping("/")
-    fun listFiles(): ResponseEntity<List<ImageDTO>> {
+    fun listFiles(): ResponseEntity<List<ImageDTO?>> {
         val imageList = imageRepository.findAllByOrderByImageIdDesc()
                 .map { imageUtil.mapImageToDTO(it, null) }
         return ResponseEntity.ok().body(imageList)
     }
 
     @GetMapping("/{token}")
-    fun listFilesWithToken(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
+    fun listFilesWithToken(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO?>> {
         val imageList = imageRepository.findAllByOrderByImageIdDesc()
                 .map { imageUtil.mapImageToDTO(it, token) }
         return ResponseEntity.ok().body(imageList)
@@ -48,7 +48,7 @@ class ImageController(
     @GetMapping("/single/{id}")
     fun getSingleImage(@PathVariable("id") id: Long): ResponseEntity<ImageDTO> {
         val image = imageRepository.findByIdOrNull(id) ?: throw NoSuchImageException("No such image.")
-        val imageDTO = imageUtil.mapImageToDTO(image, null)
+        val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, null)
 
         return ResponseEntity.ok().body(imageDTO)
     }
@@ -56,13 +56,13 @@ class ImageController(
     @GetMapping("/single/{id}/{token}")
     fun getSingleImageWithToken(@PathVariable("token") token: UUID, @PathVariable("id") id: Long): ResponseEntity<ImageDTO> {
         val image = imageRepository.findByIdOrNull(id) ?: throw NoSuchImageException("No such image.")
-        val imageDTO = imageUtil.mapImageToDTO(image, token)
+        val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, token)
 
         return ResponseEntity.ok().body(imageDTO)
     }
 
     @GetMapping("/user/{token}")
-    fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
+    fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO?>> {
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
         val imageList = imageRepository.findByUserOrderByImageIdDesc(user)
@@ -121,14 +121,14 @@ class ImageController(
                 image.downVotedUsers.remove(userToken)
                 image.upVotedUsers.add(userToken)
                 imageRepository.save(image)
-                val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+                val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, userToken)
                 ResponseEntity.ok().body(imageDTO)
             }
             else -> {
                 image.upVotedUsers.remove(userToken)
                 image.downVotedUsers.add(userToken)
                 imageRepository.save(image)
-                val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+                val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, userToken)
                 ResponseEntity.ok().body(imageDTO)
             }
         }
@@ -143,7 +143,7 @@ class ImageController(
         image.upVotedUsers.remove(userToken)
         image.downVotedUsers.remove(userToken)
         imageRepository.save(image)
-        val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+        val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, userToken)
         return ResponseEntity.ok().body(imageDTO)
     }
 }

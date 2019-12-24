@@ -30,12 +30,12 @@ class ImageUtil(
     }
 
     @Throws(NoSuchFileException::class)
-    fun mapImageToDTO(image: Image, token: UUID?): ImageDTO {
+    fun mapImageToDTO(image: Image, token: UUID?): ImageDTO? {
         val resource = ClassPathResource(image.path).filename
 
         if (resource == null) {
             image.imageId?.let { imageRepository.deleteById(it) }
-            throw NoSuchFileException("No such file.")
+            return null
         }
 
         val fileName = this.path.resolve(resource)
@@ -47,7 +47,7 @@ class ImageUtil(
             imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
         } catch (e: FileNotFoundException) {
             image.imageId?.let { imageRepository.deleteById(it) }
-            throw NoSuchFileException("No such file.")
+            return null
         }
 
         val userCanDelete = token?.equals(image.user.token)
