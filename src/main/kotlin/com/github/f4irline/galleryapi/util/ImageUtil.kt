@@ -11,10 +11,7 @@ import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Component
 import org.springframework.util.StreamUtils
 import java.awt.image.BufferedImage
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.nio.file.Path
 import java.util.*
 import javax.imageio.IIOImage
@@ -44,12 +41,15 @@ class ImageUtil(
         val fileName = this.path.resolve(resource)
         val urlResource = UrlResource(fileName.toUri())
 
-        if (!urlResource.isFile) {
+        val imgBytes: ByteArray
+
+        try {
+            imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
+        } catch (e: FileNotFoundException) {
             image.imageId?.let { imageRepository.deleteById(it) }
             throw NoSuchFileException("No such file.")
         }
 
-        val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
         val userCanDelete = token?.equals(image.user.token)
         val comments = image.comments
                 .map { mapCommentToDTO(it, token) }
