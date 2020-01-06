@@ -9,6 +9,7 @@ import com.github.f4irline.galleryapi.repository.CommentRepository
 import com.github.f4irline.galleryapi.repository.ImageRepository
 import com.github.f4irline.galleryapi.repository.UserRepository
 import com.github.f4irline.galleryapi.response.Success
+import com.github.f4irline.galleryapi.util.ImageUtil
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,7 +21,8 @@ import java.util.*
 class CommentController(
         private val imageRepository: ImageRepository,
         private val userRepository: UserRepository,
-        private val commentRepository: CommentRepository
+        private val commentRepository: CommentRepository,
+        private val imageUtil: ImageUtil
 ) {
     @PostMapping("/{imageId}/{userToken}")
     @Throws
@@ -37,8 +39,9 @@ class CommentController(
 
         image.comments.add(comment)
         val newComment = commentRepository.save(comment)
+        val commentDTO = imageUtil.mapCommentToDTO(newComment, userToken, image)
 
-        return ResponseEntity.ok().body(CommentDTO(newComment.author, newComment.comment, newComment.commentId, true, newComment.timeStamp, image.author, image.name, image.imageId))
+        return ResponseEntity.ok().body(commentDTO)
     }
 
     @GetMapping("/{userToken}")
@@ -46,7 +49,7 @@ class CommentController(
     fun getUserComments(@PathVariable("userToken") userToken: UUID): ResponseEntity<List<CommentDTO>> {
         val comments = commentRepository.findAll()
                 .filter{ it.user.token == userToken }
-                .map{ CommentDTO(it.author, it.comment, it.commentId, true, it.timeStamp, it.image.author, it.image.name, it.image.imageId)}
+                .map{ imageUtil.mapCommentToDTO(it, userToken, it.image)}
         return ResponseEntity.ok().body(comments)
     }
 

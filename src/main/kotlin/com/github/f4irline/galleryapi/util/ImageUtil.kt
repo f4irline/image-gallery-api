@@ -52,7 +52,7 @@ class ImageUtil(
 
         val userCanDelete = token?.equals(image.user.token)
         val comments = image.comments
-                .map { mapCommentToDTO(it, token) }
+                .map { mapCommentToDTO(it, token, image) }
                 .sortedByDescending { it.id }
         val score = image.upVotedUsers.size - image.downVotedUsers.size
         val userUpVoted = image.upVotedUsers.any { it == token }
@@ -72,9 +72,9 @@ class ImageUtil(
         )
     }
 
-    fun mapCommentToDTO(comment: Comment, token: UUID?): CommentDTO {
+    fun mapCommentToDTO(comment: Comment, token: UUID?, image: Image): CommentDTO {
         val userCanDelete = token?.equals(comment.user.token)
-        return CommentDTO(comment.author, comment.comment, comment.commentId, userCanDelete)
+        return CommentDTO(comment.author, comment.comment, comment.commentId, userCanDelete, comment.timeStamp, image.author, image.name, image.imageId)
     }
 
     fun compressAndSave(path: Path, image: BufferedImage) {
