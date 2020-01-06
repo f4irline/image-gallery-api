@@ -1,6 +1,5 @@
 package com.github.f4irline.galleryapi
 
-import com.github.f4irline.galleryapi.service.AmazonClient
 import com.github.f4irline.galleryapi.service.CustomServletContextListener
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -9,7 +8,6 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import java.nio.file.Path
 import java.nio.file.Paths
-import javax.annotation.PostConstruct
 import javax.servlet.ServletContextListener
 
 @EnableCaching
