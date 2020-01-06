@@ -7,6 +7,7 @@ import com.github.f4irline.galleryapi.exception.NoSuchUserException
 import com.github.f4irline.galleryapi.repository.ImageRepository
 import com.github.f4irline.galleryapi.repository.UserRepository
 import com.github.f4irline.galleryapi.response.Success
+import com.github.f4irline.galleryapi.service.AmazonClient
 import com.github.f4irline.galleryapi.util.ImageUtil
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
@@ -29,7 +30,8 @@ class ImageController(
         private val imageRepository: ImageRepository,
         private val userRepository: UserRepository,
         private val path: Path,
-        private val imageUtil: ImageUtil
+        private val imageUtil: ImageUtil,
+        private val amazonClient: AmazonClient
 ) {
     @GetMapping("/")
     fun listFiles(): ResponseEntity<List<ImageDTO>> {
@@ -91,6 +93,8 @@ class ImageController(
 
         imageUtil.compressAndSave(path.resolve(imagePath), image)
         userRepository.save(user)
+
+        amazonClient.uploadFile(file, imagePath)
 
         return ResponseEntity.ok().body(Success("Uploaded image successfully"))
     }
