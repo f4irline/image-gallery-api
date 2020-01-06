@@ -38,7 +38,7 @@ class CommentController(
         image.comments.add(comment)
         val newComment = commentRepository.save(comment)
 
-        return ResponseEntity.ok().body(CommentDTO(newComment.author, newComment.comment, newComment.commentId, true))
+        return ResponseEntity.ok().body(CommentDTO(newComment.author, newComment.comment, newComment.commentId, true, newComment.timeStamp, image.author, image.name, image.imageId))
     }
 
     @GetMapping("/{userToken}")
@@ -46,7 +46,7 @@ class CommentController(
     fun getUserComments(@PathVariable("userToken") userToken: UUID): ResponseEntity<List<CommentDTO>> {
         val comments = commentRepository.findAll()
                 .filter{ it.user.token == userToken }
-                .map{ CommentDTO(it.author, it.comment, it.commentId, true)}
+                .map{ CommentDTO(it.author, it.comment, it.commentId, true, it.timeStamp, it.image.author, it.image.name, it.image.imageId)}
         return ResponseEntity.ok().body(comments)
     }
 

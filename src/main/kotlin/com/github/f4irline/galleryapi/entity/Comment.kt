@@ -1,12 +1,14 @@
 package com.github.f4irline.galleryapi.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import java.util.*
 import javax.persistence.*
 
 @Entity
 class Comment (
         val comment: String,
         var author: String,
+        val timeStamp: Long,
         @JsonIgnore
         @ManyToOne
         @JoinColumn(name = "user_id")
