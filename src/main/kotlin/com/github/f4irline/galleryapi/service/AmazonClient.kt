@@ -7,21 +7,25 @@ import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
-import com.amazonaws.services.s3.model.CannedAccessControlList
-import com.amazonaws.services.s3.model.PutObjectRequest
+import com.amazonaws.services.s3.model.*
+import com.github.f4irline.galleryapi.util.ImageUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.file.Path
 import javax.annotation.PostConstruct
+import javax.imageio.ImageIO
 
 @Service
-class AmazonClient () {
+class AmazonClient (
+        private val imageUtil: ImageUtil,
+        private val path: Path
+        ) {
     @Value("\${amazonProperties.endpointUrl}")
     private lateinit var endpointUrl: String
 
@@ -48,8 +52,6 @@ class AmazonClient () {
 
     @PostConstruct
     fun initAws() {
-        logger.info("Access Key: $accessKey")
-        logger.info("Secret: $secretKey")
         val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
         this.s3Client = amazonS3Client(AWSStaticCredentialsProvider(credentials))
     }
@@ -68,8 +70,6 @@ class AmazonClient () {
     }
 
     fun uploadFile(multipartFile: MultipartFile, fileName: String): String {
-        logger.info("Endpoint: $endpointUrl")
-        logger.info("Bucket: $bucketName")
         var fileUrl = ""
         try {
             val file: File = convertMultiPartToFile(multipartFile, fileName)
@@ -80,5 +80,23 @@ class AmazonClient () {
             e.printStackTrace()
         }
         return fileUrl
+    }
+
+    private fun getImages(): List<String> {
+        val images: ObjectListing = s3Client.listObjects(bucketName)
+        return images.objectSummaries.map { it.key }
+    }
+
+    fun downloadImages() {
+        logger.info("Downloading images...")
+        val images = getImages()
+        for (image in images) {
+            logger.info("Image: $image")
+            val img: S3Object = s3Client.getObject(bucketName, image)
+            val imagePath = path.resolve(image).toString()
+            val file = ImageIO.read(img.objectContent)
+            imageUtil.compressAndSave(path.resolve(imagePath), file)
+        }
+        logger.info("Downloaded images successfully.")
     }
 }
