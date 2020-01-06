@@ -44,6 +44,8 @@ class AmazonClient () {
 
     @PostConstruct
     fun initAws() {
+        print(accessKey)
+        print(secretKey)
         val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
         this.s3Client = amazonS3Client(AWSStaticCredentialsProvider(credentials))
     }
@@ -62,6 +64,8 @@ class AmazonClient () {
     }
 
     fun uploadFile(multipartFile: MultipartFile, fileName: String): String {
+        print(endpointUrl)
+        print(bucketName)
         var fileUrl = ""
         try {
             val file: File = convertMultiPartToFile(multipartFile, fileName)
