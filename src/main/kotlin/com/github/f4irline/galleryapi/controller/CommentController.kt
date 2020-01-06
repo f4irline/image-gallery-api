@@ -41,6 +41,15 @@ class CommentController(
         return ResponseEntity.ok().body(CommentDTO(newComment.author, newComment.comment, newComment.commentId, true))
     }
 
+    @GetMapping("/{userToken}")
+    @Throws
+    fun getUserComments(@PathVariable("userToken") userToken: UUID): ResponseEntity<List<CommentDTO>> {
+        val comments = commentRepository.findAll()
+                .filter{ it.user.token == userToken }
+                .map{ CommentDTO(it.author, it.comment, it.commentId, true)}
+        return ResponseEntity.ok().body(comments)
+    }
+
     @DeleteMapping("/{userToken}/{commentId}")
     fun deleteComment(
             @PathVariable("userToken") userToken: UUID, @PathVariable("commentId") commentId: Long
