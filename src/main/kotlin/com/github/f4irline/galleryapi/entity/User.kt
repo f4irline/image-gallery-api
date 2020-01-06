@@ -4,6 +4,7 @@ import java.util.*
 import javax.persistence.*
 
 @Entity
+@Table(name = "GALLERY_USER")
 class User (
         val name: String,
         val token: UUID = UUID.randomUUID(),

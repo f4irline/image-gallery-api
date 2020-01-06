@@ -5,15 +5,13 @@ import com.github.f4irline.galleryapi.dto.ImageDTO
 import com.github.f4irline.galleryapi.entity.Comment
 import com.github.f4irline.galleryapi.exception.NoSuchFileException
 import com.github.f4irline.galleryapi.entity.Image
+import com.github.f4irline.galleryapi.repository.ImageRepository
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Component
 import org.springframework.util.StreamUtils
 import java.awt.image.BufferedImage
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.nio.file.Path
 import java.util.*
 import javax.imageio.IIOImage
@@ -24,17 +22,34 @@ import javax.imageio.stream.ImageOutputStream
 
 @Component
 class ImageUtil(
-        private val path: Path
+        private val path: Path,
+        private val imageRepository: ImageRepository
 ) {
     companion object {
-        const val COMPRESSION_RATIO = 0.02f
+        const val COMPRESSION_RATIO = 0.8f
     }
 
-    fun mapImageToDTO(image: Image, token: UUID?): ImageDTO {
-        val resource = ClassPathResource(image.path).filename ?: throw NoSuchFileException("No such file.")
+    @Throws(NoSuchFileException::class)
+    fun mapImageToDTO(image: Image, token: UUID?): ImageDTO? {
+        val resource = ClassPathResource(image.path).filename
+
+        if (resource == null) {
+            image.imageId?.let { imageRepository.deleteById(it) }
+            return null
+        }
+
         val fileName = this.path.resolve(resource)
         val urlResource = UrlResource(fileName.toUri())
-        val imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
+
+        val imgBytes: ByteArray
+
+        try {
+            imgBytes = StreamUtils.copyToByteArray(urlResource.inputStream)
+        } catch (e: FileNotFoundException) {
+            image.imageId?.let { imageRepository.deleteById(it) }
+            return null
+        }
+
         val userCanDelete = token?.equals(image.user.token)
         val comments = image.comments
                 .map { mapCommentToDTO(it, token) }

@@ -19,9 +19,9 @@ import java.util.*
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.GetMapping
 import java.awt.image.BufferedImage
-import java.io.ByteArrayInputStream
-import java.io.File
+import kotlinx.coroutines.*
 import java.io.FileNotFoundException
+import javax.annotation.PostConstruct
 import javax.imageio.ImageIO
 
 @RestController
@@ -33,15 +33,20 @@ class ImageController(
         private val imageUtil: ImageUtil,
         private val amazonClient: AmazonClient
 ) {
+    @PostConstruct
+    private fun init() {
+        amazonClient.downloadImages()
+    }
+
     @GetMapping("/")
-    fun listFiles(): ResponseEntity<List<ImageDTO>> {
+    fun listFiles(): ResponseEntity<List<ImageDTO?>> {
         val imageList = imageRepository.findAllByOrderByImageIdDesc()
                 .map { imageUtil.mapImageToDTO(it, null) }
         return ResponseEntity.ok().body(imageList)
     }
 
     @GetMapping("/{token}")
-    fun listFilesWithToken(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
+    fun listFilesWithToken(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO?>> {
         val imageList = imageRepository.findAllByOrderByImageIdDesc()
                 .map { imageUtil.mapImageToDTO(it, token) }
         return ResponseEntity.ok().body(imageList)
@@ -50,7 +55,7 @@ class ImageController(
     @GetMapping("/single/{id}")
     fun getSingleImage(@PathVariable("id") id: Long): ResponseEntity<ImageDTO> {
         val image = imageRepository.findByIdOrNull(id) ?: throw NoSuchImageException("No such image.")
-        val imageDTO = imageUtil.mapImageToDTO(image, null)
+        val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, null)
 
         return ResponseEntity.ok().body(imageDTO)
     }
@@ -58,13 +63,13 @@ class ImageController(
     @GetMapping("/single/{id}/{token}")
     fun getSingleImageWithToken(@PathVariable("token") token: UUID, @PathVariable("id") id: Long): ResponseEntity<ImageDTO> {
         val image = imageRepository.findByIdOrNull(id) ?: throw NoSuchImageException("No such image.")
-        val imageDTO = imageUtil.mapImageToDTO(image, token)
+        val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, token)
 
         return ResponseEntity.ok().body(imageDTO)
     }
 
     @GetMapping("/user/{token}")
-    fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO>> {
+    fun getUserImages(@PathVariable("token") token: UUID): ResponseEntity<List<ImageDTO?>> {
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
 
         val imageList = imageRepository.findByUserOrderByImageIdDesc(user)
@@ -78,7 +83,7 @@ class ImageController(
     fun uploadImage(
             @RequestPart("file") file: MultipartFile?,
             @RequestPart("name") name: String,
-            @RequestPart("description") description: String,
+            @RequestPart("description") description: String?,
             @PathVariable("token") token: UUID): ResponseEntity<*> {
         if (file == null) { throw FileNotFoundException() }
         val uuid = UUID.randomUUID().toString()
@@ -88,13 +93,15 @@ class ImageController(
         val image: BufferedImage = ImageIO.read(file.inputStream)
 
         val imageList: MutableSet<Image> = user.imageList
-        val newImage = Image(imagePath, name, description, user.name, image.width, image.height, user)
+        val newImage = Image(imagePath, name, description?: "", user.name, image.width, image.height, user)
         imageList.add(newImage)
 
         imageUtil.compressAndSave(path.resolve(imagePath), image)
         userRepository.save(user)
 
-        amazonClient.uploadFile(file, imagePath)
+        GlobalScope.launch {
+            amazonClient.uploadFile(file, "${uuid}.jpg")
+        }
 
         return ResponseEntity.ok().body(Success("Uploaded image successfully"))
     }
@@ -125,14 +132,14 @@ class ImageController(
                 image.downVotedUsers.remove(userToken)
                 image.upVotedUsers.add(userToken)
                 imageRepository.save(image)
-                val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+                val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, userToken)
                 ResponseEntity.ok().body(imageDTO)
             }
             else -> {
                 image.upVotedUsers.remove(userToken)
                 image.downVotedUsers.add(userToken)
                 imageRepository.save(image)
-                val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+                val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, userToken)
                 ResponseEntity.ok().body(imageDTO)
             }
         }
@@ -147,7 +154,7 @@ class ImageController(
         image.upVotedUsers.remove(userToken)
         image.downVotedUsers.remove(userToken)
         imageRepository.save(image)
-        val imageDTO: ImageDTO = imageUtil.mapImageToDTO(image, userToken)
+        val imageDTO: ImageDTO? = imageUtil.mapImageToDTO(image, userToken)
         return ResponseEntity.ok().body(imageDTO)
     }
 }
