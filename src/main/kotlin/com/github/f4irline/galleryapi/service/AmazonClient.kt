@@ -4,6 +4,7 @@ import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.PutObjectRequest
@@ -17,7 +18,7 @@ import javax.annotation.PostConstruct
 
 @Service
 class AmazonClient (
-        var s3Client: AmazonS3
+        var s3Client: AmazonS3Client
 ) {
     @Value("\${amazonProperties.endpointUrl}")
     private lateinit var endpointUrl: String
@@ -34,7 +35,7 @@ class AmazonClient (
     @PostConstruct
     fun initAws() {
         val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
-        this.s3Client = AmazonS3ClientBuilder.standard().withCredentials(AWSStaticCredentialsProvider(credentials)).build()
+        this.s3Client = AmazonS3ClientBuilder.standard().withCredentials(AWSStaticCredentialsProvider(credentials)).build() as AmazonS3Client
     }
 
     @Throws(IOException::class)
