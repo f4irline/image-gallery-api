@@ -1,14 +1,15 @@
 package com.github.f4irline.galleryapi.service
 
 import com.amazonaws.auth.AWSCredentials
+import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.PutObjectRequest
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
@@ -17,9 +18,7 @@ import java.io.IOException
 import javax.annotation.PostConstruct
 
 @Service
-class AmazonClient (
-        var s3Client: AmazonS3Client
-) {
+class AmazonClient () {
     @Value("\${amazonProperties.endpointUrl}")
     private lateinit var endpointUrl: String
 
@@ -32,10 +31,16 @@ class AmazonClient (
     @Value("\${AWS_SECRET_ACCESS_KEY}")
     private lateinit var secretKey: String
 
+    private lateinit var s3Client: AmazonS3
+
+    fun amazonS3Client(credentialsProvider: AWSCredentialsProvider): AmazonS3 {
+        return AmazonS3ClientBuilder.standard().withCredentials(credentialsProvider).build()
+    }
+
     @PostConstruct
     fun initAws() {
         val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
-        this.s3Client = AmazonS3ClientBuilder.standard().withCredentials(AWSStaticCredentialsProvider(credentials)).build() as AmazonS3Client
+        this.s3Client = amazonS3Client(AWSStaticCredentialsProvider(credentials))
     }
 
     @Throws(IOException::class)
