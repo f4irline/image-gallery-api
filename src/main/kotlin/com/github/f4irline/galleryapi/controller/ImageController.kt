@@ -77,7 +77,7 @@ class ImageController(
     fun uploadImage(
             @RequestPart("file") file: MultipartFile?,
             @RequestPart("name") name: String,
-            @RequestPart("description") description: String,
+            @RequestPart("description") description: String?,
             @PathVariable("token") token: UUID): ResponseEntity<*> {
         if (file == null) { throw FileNotFoundException() }
         val uuid = UUID.randomUUID().toString()
@@ -87,7 +87,7 @@ class ImageController(
         val image: BufferedImage = ImageIO.read(file.inputStream)
 
         val imageList: MutableSet<Image> = user.imageList
-        val newImage = Image(imagePath, name, description, user.name, image.width, image.height, user)
+        val newImage = Image(imagePath, name, description?: "", user.name, image.width, image.height, user)
         imageList.add(newImage)
 
         imageUtil.compressAndSave(path.resolve(imagePath), image)
@@ -96,7 +96,7 @@ class ImageController(
         GlobalScope.launch {
             amazonClient.uploadFile(file, "${uuid}.jpg")
         }
-        
+
         return ResponseEntity.ok().body(Success("Uploaded image successfully"))
     }
 
