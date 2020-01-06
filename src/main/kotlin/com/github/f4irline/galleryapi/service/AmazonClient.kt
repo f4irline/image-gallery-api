@@ -4,6 +4,7 @@ import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.regions.Regions
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.CannedAccessControlList
@@ -34,7 +35,11 @@ class AmazonClient () {
     private lateinit var s3Client: AmazonS3
 
     fun amazonS3Client(credentialsProvider: AWSCredentialsProvider): AmazonS3 {
-        return AmazonS3ClientBuilder.standard().withCredentials(credentialsProvider).build()
+        return AmazonS3ClientBuilder
+                .standard()
+                .withRegion(Regions.EU_NORTH_1)
+                .withCredentials(credentialsProvider)
+                .build()
     }
 
     @PostConstruct
