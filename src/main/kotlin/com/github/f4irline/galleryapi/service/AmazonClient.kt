@@ -48,8 +48,8 @@ class AmazonClient () {
     fun initAws() {
         this.accessKey = System.getenv("AWS_ACCESS_KEY_ID")
         this.secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
-        logger.debug("Access Key: $accessKey")
-        logger.debug("Secret: $secretKey")
+        logger.info("Access Key: $accessKey")
+        logger.info("Secret: $secretKey")
         val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
         this.s3Client = amazonS3Client(AWSStaticCredentialsProvider(credentials))
     }
@@ -68,8 +68,8 @@ class AmazonClient () {
     }
 
     fun uploadFile(multipartFile: MultipartFile, fileName: String): String {
-        logger.debug("Endpoint: $endpointUrl")
-        logger.debug("Bucket: $bucketName")
+        logger.info("Endpoint: $endpointUrl")
+        logger.info("Bucket: $bucketName")
         var fileUrl = ""
         try {
             val file: File = convertMultiPartToFile(multipartFile, fileName)
