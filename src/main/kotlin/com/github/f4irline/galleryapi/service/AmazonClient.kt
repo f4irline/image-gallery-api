@@ -28,10 +28,8 @@ class AmazonClient () {
     @Value("\${amazonProperties.bucketName}")
     private lateinit var bucketName: String
 
-    @Value("\${amazonProperties.accessKeyId}")
     private lateinit var accessKey: String
 
-    @Value("\${amazonProperties.secretKey}")
     private lateinit var secretKey: String
 
     private lateinit var s3Client: AmazonS3
@@ -48,6 +46,8 @@ class AmazonClient () {
 
     @PostConstruct
     fun initAws() {
+        this.accessKey = System.getenv("AWS_ACCESS_KEY_ID")
+        this.secretKey = System.getenv("AWS_SECRET_ACCESS_KEY")
         logger.debug("Access Key: $accessKey")
         logger.debug("Secret: $secretKey")
         val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
