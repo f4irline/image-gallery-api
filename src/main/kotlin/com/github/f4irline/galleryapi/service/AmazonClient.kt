@@ -9,6 +9,8 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.amazonaws.services.s3.model.PutObjectRequest
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.stereotype.Service
@@ -26,13 +28,15 @@ class AmazonClient () {
     @Value("\${amazonProperties.bucketName}")
     private lateinit var bucketName: String
 
-    @Value("\${AWS_ACCESS_KEY_ID}")
+    @Value("\${amazonProperties.accessKeyId}")
     private lateinit var accessKey: String
 
-    @Value("\${AWS_SECRET_ACCESS_KEY}")
+    @Value("\${amazonProperties.secretKey}")
     private lateinit var secretKey: String
 
     private lateinit var s3Client: AmazonS3
+
+    private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     fun amazonS3Client(credentialsProvider: AWSCredentialsProvider): AmazonS3 {
         return AmazonS3ClientBuilder
@@ -44,8 +48,8 @@ class AmazonClient () {
 
     @PostConstruct
     fun initAws() {
-        print(accessKey)
-        print(secretKey)
+        logger.debug("Access Key: $accessKey")
+        logger.debug("Secret: $secretKey")
         val credentials: AWSCredentials = BasicAWSCredentials(accessKey, secretKey)
         this.s3Client = amazonS3Client(AWSStaticCredentialsProvider(credentials))
     }
@@ -64,8 +68,8 @@ class AmazonClient () {
     }
 
     fun uploadFile(multipartFile: MultipartFile, fileName: String): String {
-        print(endpointUrl)
-        print(bucketName)
+        logger.debug("Endpoint: $endpointUrl")
+        logger.debug("Bucket: $bucketName")
         var fileUrl = ""
         try {
             val file: File = convertMultiPartToFile(multipartFile, fileName)
