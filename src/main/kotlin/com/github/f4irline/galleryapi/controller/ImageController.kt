@@ -19,8 +19,7 @@ import java.util.*
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.GetMapping
 import java.awt.image.BufferedImage
-import java.io.ByteArrayInputStream
-import java.io.File
+import kotlinx.coroutines.*
 import java.io.FileNotFoundException
 import javax.imageio.ImageIO
 
@@ -94,8 +93,10 @@ class ImageController(
         imageUtil.compressAndSave(path.resolve(imagePath), image)
         userRepository.save(user)
 
-        amazonClient.uploadFile(file, imagePath)
-
+        GlobalScope.launch {
+            amazonClient.uploadFile(file, "${uuid}.jpg")
+        }
+        
         return ResponseEntity.ok().body(Success("Uploaded image successfully"))
     }
 
