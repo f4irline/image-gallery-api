@@ -14,9 +14,7 @@ import javax.servlet.ServletContextListener
 
 @EnableCaching
 @SpringBootApplication
-class GalleryApiApplication(
-		private val amazonClient: AmazonClient
-) {
+class GalleryApiApplication {
 	@Bean
 	fun path(): Path {
 		return Paths.get(System.getProperty("java.io.tmpdir")+"/image-gallery-api")
@@ -27,11 +25,6 @@ class GalleryApiApplication(
 		val servletRegistrationBean: ServletListenerRegistrationBean<ServletContextListener> = ServletListenerRegistrationBean()
 		servletRegistrationBean.listener = CustomServletContextListener(path())
 		return servletRegistrationBean
-	}
-
-	@PostConstruct
-	private fun init() {
-		amazonClient.downloadImages()
 	}
 }
 

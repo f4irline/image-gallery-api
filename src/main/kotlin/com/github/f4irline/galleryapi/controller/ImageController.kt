@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import java.awt.image.BufferedImage
 import kotlinx.coroutines.*
 import java.io.FileNotFoundException
+import javax.annotation.PostConstruct
 import javax.imageio.ImageIO
 
 @RestController
@@ -32,6 +33,11 @@ class ImageController(
         private val imageUtil: ImageUtil,
         private val amazonClient: AmazonClient
 ) {
+    @PostConstruct
+    private fun init() {
+        amazonClient.downloadImages()
+    }
+
     @GetMapping("/")
     fun listFiles(): ResponseEntity<List<ImageDTO?>> {
         val imageList = imageRepository.findAllByOrderByImageIdDesc()
