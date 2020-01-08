@@ -6,6 +6,7 @@ import com.github.f4irline.galleryapi.entity.Comment
 import com.github.f4irline.galleryapi.exception.NoSuchFileException
 import com.github.f4irline.galleryapi.entity.Image
 import com.github.f4irline.galleryapi.repository.ImageRepository
+import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Component
@@ -25,6 +26,8 @@ class ImageUtil(
         private val path: Path,
         private val imageRepository: ImageRepository
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     companion object {
         const val COMPRESSION_RATIO = 0.8f
     }
@@ -107,9 +110,15 @@ class ImageUtil(
     fun resizeImage(image: BufferedImage): BufferedImage {
         val aspectRatio = image.width / image.height
 
+        logger.info("Aspect ratio: $aspectRatio")
+
         if (aspectRatio > 1) {
             val newWidth = 1920
             val newHeight = newWidth / aspectRatio
+
+            logger.info("New width: $newWidth")
+            logger.info("New height: $newHeight")
+
             val tempImg = image.getScaledInstance(newWidth, newHeight, java.awt.Image.SCALE_DEFAULT)
             val dImg = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
 
@@ -121,6 +130,10 @@ class ImageUtil(
         } else {
             val newHeight = 1920
             val newWidth = newHeight * aspectRatio
+
+            logger.info("New width: $newWidth")
+            logger.info("New height: $newHeight")
+
             val tempImg = image.getScaledInstance(newWidth, newHeight, java.awt.Image.SCALE_DEFAULT)
             val dImg = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
 
