@@ -10,7 +10,6 @@ import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Component
 import org.springframework.util.StreamUtils
-import java.awt.image.BufferedImage
 import java.io.*
 import java.nio.file.Path
 import java.util.*
@@ -19,6 +18,7 @@ import javax.imageio.ImageIO
 import javax.imageio.ImageWriteParam
 import javax.imageio.ImageWriter
 import javax.imageio.stream.ImageOutputStream
+import java.awt.image.BufferedImage
 
 @Component
 class ImageUtil(
@@ -91,10 +91,44 @@ class ImageUtil(
             param.compressionQuality = COMPRESSION_RATIO
         }
 
-        writer.write(null, IIOImage(image, null, null), param)
+        var resultImage: BufferedImage = image
+
+        if (image.width > 1920 || image.height > 1920) {
+            resultImage = resizeImage(image)
+        }
+
+        writer.write(null, IIOImage(resultImage, null, null), param)
 
         out.close()
         ios.close()
         writer.dispose()
+    }
+
+    fun resizeImage(image: BufferedImage): BufferedImage {
+        val aspectRatio = image.width / image.height
+
+        if (aspectRatio > 1) {
+            val newWidth = 1920
+            val newHeight = newWidth / aspectRatio
+            val tempImg = image.getScaledInstance(newWidth, newHeight, java.awt.Image.SCALE_DEFAULT)
+            val dImg = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
+
+            val g2d = dImg.createGraphics()
+            g2d.drawImage(tempImg, 0, 0, null)
+            g2d.dispose()
+
+            return dImg
+        } else {
+            val newHeight = 1920
+            val newWidth = newHeight * aspectRatio
+            val tempImg = image.getScaledInstance(newWidth, newHeight, java.awt.Image.SCALE_DEFAULT)
+            val dImg = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
+
+            val g2d = dImg.createGraphics()
+            g2d.drawImage(tempImg, 0, 0, null)
+            g2d.dispose()
+
+            return dImg
+        }
     }
 }
