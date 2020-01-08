@@ -15,8 +15,8 @@ class UserController(private val repository: UserRepository) {
     @PostMapping("/register")
     fun register(@RequestBody authDetails: AuthDetails): ResponseEntity<*> {
         val user: User
-        return if (!authDetails.name.matches("^[a-zA-Z0-9]{3,}\$".toRegex())) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("Name should be 3 letters long"))
+        return if (!authDetails.name.matches("^[a-zA-Z0-9æøöäåÆØÖÄÅ]{3,}\$".toRegex())) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("Name should be 3 letters long. No special letters allowed."))
         } else if (repository.findByName(authDetails.name) !== null) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("User with this name already exists"))
         } else {
