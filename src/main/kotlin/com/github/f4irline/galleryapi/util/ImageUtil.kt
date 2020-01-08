@@ -6,6 +6,7 @@ import com.github.f4irline.galleryapi.entity.Comment
 import com.github.f4irline.galleryapi.exception.NoSuchFileException
 import com.github.f4irline.galleryapi.entity.Image
 import com.github.f4irline.galleryapi.repository.ImageRepository
+import net.coobird.thumbnailator.Thumbnails
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.UrlResource
@@ -119,14 +120,7 @@ class ImageUtil(
             logger.info("New width: $newWidth")
             logger.info("New height: $newHeight")
 
-            val tempImg = image.getScaledInstance(newWidth.toInt(), newHeight.toInt(), java.awt.Image.SCALE_DEFAULT)
-            val dImg = BufferedImage(newWidth.toInt(), newHeight.toInt(), BufferedImage.TYPE_INT_ARGB)
-
-            val g2d = dImg.createGraphics()
-            g2d.drawImage(tempImg, 0, 0, null)
-            g2d.dispose()
-
-            return dImg
+            return Thumbnails.of(image).size(newWidth.toInt(), newHeight.toInt()).asBufferedImage()
         } else {
             val newHeight = 1920.0
             val newWidth = newHeight * aspectRatio
@@ -134,14 +128,7 @@ class ImageUtil(
             logger.info("New width: $newWidth")
             logger.info("New height: $newHeight")
 
-            val tempImg = image.getScaledInstance(newWidth.toInt(), newHeight.toInt(), java.awt.Image.SCALE_DEFAULT)
-            val dImg = BufferedImage(newWidth.toInt(), newHeight.toInt(), BufferedImage.TYPE_INT_ARGB)
-
-            val g2d = dImg.createGraphics()
-            g2d.drawImage(tempImg, 0, 0, null)
-            g2d.dispose()
-
-            return dImg
+            return Thumbnails.of(image).size(newWidth.toInt(), newHeight.toInt()).asBufferedImage()
         }
     }
 }

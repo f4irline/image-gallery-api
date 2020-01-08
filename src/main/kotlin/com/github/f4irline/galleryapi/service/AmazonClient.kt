@@ -25,7 +25,7 @@ import javax.imageio.ImageIO
 class AmazonClient (
         private val imageUtil: ImageUtil,
         private val path: Path
-        ) {
+) {
     @Value("\${amazonProperties.endpointUrl}")
     private lateinit var endpointUrl: String
 
