@@ -94,10 +94,12 @@ class ImageController(
         val image: BufferedImage = ImageIO.read(file.inputStream)
 
         val imageList: MutableSet<Image> = user.imageList
-        val newImage = Image(imagePath, name, description?: "", user.name, image.width, image.height, user)
-        imageList.add(newImage)
 
         val resultImage: BufferedImage = imageUtil.compressAndSave(path.resolve(imagePath), image)
+
+        val newImage = Image(imagePath, name, description?: "", user.name, resultImage.width, resultImage.height, user)
+        imageList.add(newImage)
+
         userRepository.save(user)
 
         GlobalScope.launch {
