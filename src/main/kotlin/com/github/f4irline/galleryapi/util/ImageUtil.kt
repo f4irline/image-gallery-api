@@ -6,6 +6,9 @@ import com.github.f4irline.galleryapi.entity.Comment
 import com.github.f4irline.galleryapi.exception.NoSuchFileException
 import com.github.f4irline.galleryapi.entity.Image
 import com.github.f4irline.galleryapi.repository.ImageRepository
+import com.github.f4irline.galleryapi.service.AmazonClient
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import net.coobird.thumbnailator.Thumbnails
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ClassPathResource
@@ -25,7 +28,8 @@ import java.awt.image.BufferedImage
 @Component
 class ImageUtil(
         private val path: Path,
-        private val imageRepository: ImageRepository
+        private val imageRepository: ImageRepository,
+        private val amazonClient: AmazonClient
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -81,7 +85,7 @@ class ImageUtil(
         return CommentDTO(comment.author, comment.comment, comment.commentId, userCanDelete, comment.timeStamp, image.author, image.name, image.imageId)
     }
 
-    fun compressAndSave(path: Path, image: BufferedImage) {
+    fun compressAndSave(path: Path, image: BufferedImage): BufferedImage {
         val output = File(path.toUri())
         val out: OutputStream = FileOutputStream(output)
 
@@ -106,6 +110,8 @@ class ImageUtil(
         out.close()
         ios.close()
         writer.dispose()
+
+        return resultImage
     }
 
     fun resizeImage(image: BufferedImage): BufferedImage {

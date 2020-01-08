@@ -97,11 +97,11 @@ class ImageController(
         val newImage = Image(imagePath, name, description?: "", user.name, image.width, image.height, user)
         imageList.add(newImage)
 
-        imageUtil.compressAndSave(path.resolve(imagePath), image)
+        val resultImage: BufferedImage = imageUtil.compressAndSave(path.resolve(imagePath), image)
         userRepository.save(user)
 
         GlobalScope.launch {
-            amazonClient.uploadFile(file, "${uuid}.jpg")
+            amazonClient.uploadFile(resultImage, "${uuid}.jpg")
         }
 
         return ResponseEntity.ok().body(Success("Uploaded image successfully"))
