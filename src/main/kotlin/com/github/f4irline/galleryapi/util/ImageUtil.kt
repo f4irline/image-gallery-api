@@ -28,8 +28,7 @@ import java.awt.image.BufferedImage
 @Component
 class ImageUtil(
         private val path: Path,
-        private val imageRepository: ImageRepository,
-        private val amazonClient: AmazonClient
+        private val imageRepository: ImageRepository
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
