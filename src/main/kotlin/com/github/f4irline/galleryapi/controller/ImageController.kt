@@ -114,7 +114,7 @@ class ImageController(
         val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
 
         return if (image.user.token != userToken) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token."))
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token"))
         } else {
             imageRepository.deleteById(imageId)
             ResponseEntity.ok().body(Success("Deleted image successfully"))

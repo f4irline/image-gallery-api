@@ -60,10 +60,10 @@ class CommentController(
         val comment = commentRepository.findByIdOrNull(commentId) ?: throw NoSuchCommentException("No such comment.")
 
         return if (comment.user.token != userToken) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token."))
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token"))
         } else {
             commentRepository.deleteById(commentId)
-            ResponseEntity.ok().body(Success("Deleted comment successfully."))
+            ResponseEntity.ok().body(Success("Deleted comment successfully"))
         }
     }
 }

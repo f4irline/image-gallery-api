@@ -16,13 +16,13 @@ class UserController(private val repository: UserRepository) {
     fun register(@RequestBody authDetails: AuthDetails): ResponseEntity<*> {
         val user: User
         return if (!authDetails.name.matches("^[a-zA-Z0-9]{3,}\$".toRegex())) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("Name should be 3 letters long."))
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("Name should be 3 letters long"))
         } else if (repository.findByName(authDetails.name) !== null) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("User with this name already exists."))
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("User with this name already exists"))
         } else {
             user = User(authDetails.name)
             repository.save(user)
-            ResponseEntity.status(HttpStatus.OK).body(Success("Saved user successfully.", user.token))
+            ResponseEntity.status(HttpStatus.OK).body(Success("Saved user successfully", user.token))
         }
     }
 }
