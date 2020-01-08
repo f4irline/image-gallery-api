@@ -108,19 +108,19 @@ class ImageUtil(
     }
 
     fun resizeImage(image: BufferedImage): BufferedImage {
-        val aspectRatio = image.width / image.height
+        val aspectRatio: Double = image.width.toDouble() / image.height.toDouble()
 
         logger.info("Aspect ratio: $aspectRatio")
 
         if (aspectRatio > 1) {
-            val newWidth = 1920
+            val newWidth = 1920.0
             val newHeight = newWidth / aspectRatio
 
             logger.info("New width: $newWidth")
             logger.info("New height: $newHeight")
 
-            val tempImg = image.getScaledInstance(newWidth, newHeight, java.awt.Image.SCALE_DEFAULT)
-            val dImg = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
+            val tempImg = image.getScaledInstance(newWidth.toInt(), newHeight.toInt(), java.awt.Image.SCALE_DEFAULT)
+            val dImg = BufferedImage(newWidth.toInt(), newHeight.toInt(), BufferedImage.TYPE_INT_ARGB)
 
             val g2d = dImg.createGraphics()
             g2d.drawImage(tempImg, 0, 0, null)
@@ -128,14 +128,14 @@ class ImageUtil(
 
             return dImg
         } else {
-            val newHeight = 1920
+            val newHeight = 1920.0
             val newWidth = newHeight * aspectRatio
 
             logger.info("New width: $newWidth")
             logger.info("New height: $newHeight")
 
-            val tempImg = image.getScaledInstance(newWidth, newHeight, java.awt.Image.SCALE_DEFAULT)
-            val dImg = BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB)
+            val tempImg = image.getScaledInstance(newWidth.toInt(), newHeight.toInt(), java.awt.Image.SCALE_DEFAULT)
+            val dImg = BufferedImage(newWidth.toInt(), newHeight.toInt(), BufferedImage.TYPE_INT_ARGB)
 
             val g2d = dImg.createGraphics()
             g2d.drawImage(tempImg, 0, 0, null)
