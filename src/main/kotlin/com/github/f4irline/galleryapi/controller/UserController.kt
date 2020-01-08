@@ -16,7 +16,7 @@ class UserController(private val repository: UserRepository) {
     fun register(@RequestBody authDetails: AuthDetails): ResponseEntity<*> {
         val user: User
         return when {
-            authDetails.name.length < 3 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("Name should be at least 3 letters long."))
+            authDetails.name.length < 3 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("Name should be at least 3 letters long"))
             repository.findByName(authDetails.name) !== null -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Error("User with this name already exists"))
             else -> {
                 user = User(authDetails.name)
