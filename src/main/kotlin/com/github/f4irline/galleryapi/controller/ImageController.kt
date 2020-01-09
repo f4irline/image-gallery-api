@@ -2,6 +2,7 @@ package com.github.f4irline.galleryapi.controller
 
 import com.github.f4irline.galleryapi.entity.Image
 import com.github.f4irline.galleryapi.dto.ImageDTO
+import com.github.f4irline.galleryapi.exception.NoSuchFileException
 import com.github.f4irline.galleryapi.exception.NoSuchImageException
 import com.github.f4irline.galleryapi.exception.NoSuchUserException
 import com.github.f4irline.galleryapi.repository.ImageRepository
@@ -85,7 +86,7 @@ class ImageController(
             @RequestPart("name") name: String,
             @RequestPart("description") description: String?,
             @PathVariable("token") token: UUID): ResponseEntity<*> {
-        if (file == null) { throw FileNotFoundException() }
+        if (file == null) { throw NoSuchFileException("File not found.") }
         val uuid = UUID.randomUUID().toString()
         val imagePath = path.resolve("$uuid.jpg").toString()
         val user = userRepository.findByToken(token) ?: throw NoSuchUserException("No such user.")
@@ -93,14 +94,16 @@ class ImageController(
         val image: BufferedImage = ImageIO.read(file.inputStream)
 
         val imageList: MutableSet<Image> = user.imageList
-        val newImage = Image(imagePath, name, description?: "", user.name, image.width, image.height, user)
+
+        val resultImage: BufferedImage = imageUtil.compressAndSave(path.resolve(imagePath), image)
+
+        val newImage = Image(imagePath, name, description?: "", user.name, resultImage.width, resultImage.height, user)
         imageList.add(newImage)
 
-        imageUtil.compressAndSave(path.resolve(imagePath), image)
         userRepository.save(user)
 
         GlobalScope.launch {
-            amazonClient.uploadFile(file, "${uuid}.jpg")
+            amazonClient.uploadFile(resultImage, "${uuid}.jpg")
         }
 
         return ResponseEntity.ok().body(Success("Uploaded image successfully"))
@@ -113,7 +116,7 @@ class ImageController(
         val image: Image = imageRepository.findByIdOrNull(imageId) ?: throw NoSuchImageException("No such image.")
 
         return if (image.user.token != userToken) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token."))
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Error("Unauthorized token"))
         } else {
             imageRepository.deleteById(imageId)
             ResponseEntity.ok().body(Success("Deleted image successfully"))

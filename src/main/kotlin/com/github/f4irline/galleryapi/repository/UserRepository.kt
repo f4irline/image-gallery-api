@@ -6,4 +6,5 @@ import java.util.*
 
 interface UserRepository : CrudRepository<User, Long> {
     fun findByToken(token: UUID): User?
+    fun findByName(name: String): User?
 }

@@ -13,7 +13,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -25,7 +26,7 @@ import javax.imageio.ImageIO
 class AmazonClient (
         private val imageUtil: ImageUtil,
         private val path: Path
-        ) {
+) {
     @Value("\${amazonProperties.endpointUrl}")
     private lateinit var endpointUrl: String
 
@@ -57,10 +58,12 @@ class AmazonClient (
     }
 
     @Throws(IOException::class)
-    private fun convertMultiPartToFile(file: MultipartFile, fileName: String): File {
-        val convertedFile = File(file.originalFilename?: fileName)
+    private fun convertImageToFile(image: BufferedImage, fileName: String): File {
+        val convertedFile = File(fileName)
         val outputStream = FileOutputStream(convertedFile)
-        outputStream.write(file.bytes)
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        ImageIO.write(image, "jpg", byteArrayOutputStream)
+        outputStream.write(byteArrayOutputStream.toByteArray())
         outputStream.close()
         return convertedFile
     }
@@ -69,10 +72,10 @@ class AmazonClient (
         s3Client.putObject(PutObjectRequest(bucketName, fileName, file).withCannedAcl(CannedAccessControlList.PublicRead))
     }
 
-    fun uploadFile(multipartFile: MultipartFile, fileName: String): String {
+    fun uploadFile(image: BufferedImage, fileName: String): String {
         var fileUrl = ""
         try {
-            val file: File = convertMultiPartToFile(multipartFile, fileName)
+            val file: File = convertImageToFile(image, fileName)
             fileUrl = "$endpointUrl/$bucketName/$fileName"
             uploadFileToS3(fileName, file)
             file.delete()
