@@ -47,8 +47,8 @@ class CommentController(
     @GetMapping("/{userToken}")
     @Throws
     fun getUserComments(@PathVariable("userToken") userToken: UUID): ResponseEntity<List<CommentDTO>> {
-        val comments = commentRepository.findAll()
-                .filter{ it.user.token == userToken }
+        val user = userRepository.findByToken(userToken) ?: throw NoSuchUserException("No such user.")
+        val comments = commentRepository.findByUserOrderByCommentIdDesc(user)
                 .map{ imageUtil.mapCommentToDTO(it, userToken, it.image)}
         return ResponseEntity.ok().body(comments)
     }
